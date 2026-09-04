@@ -148,7 +148,7 @@ export function UsageDisplay({ initialLogs }: { initialLogs: UsageLog[] }) {
         <div className="bg-white rounded-xl border border-gray-200 p-8 text-center text-gray-500 text-sm">
           <p>No usage logs stored yet.</p>
           <p className="text-xs text-gray-400 mt-1">
-            Ensure you have added a Claude Admin key (starting with <code>sk-ant-admin...</code>) and click &quot;Sync Usage&quot; above.
+            Ensure you have added a Claude API key with Admin/Org permissions and click &quot;Sync Usage&quot; above.
           </p>
         </div>
       ) : (

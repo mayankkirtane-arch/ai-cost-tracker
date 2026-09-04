@@ -43,7 +43,7 @@ export async function POST(request: Request) {
 
   if (keysError || !keys || keys.length === 0) {
     return NextResponse.json(
-      { error: "No Anthropic API keys found. Please add a Claude Admin key first." },
+      { error: "No Anthropic API keys found. Please add a Claude API key first." },
       { status: 404 }
     );
   }
@@ -80,17 +80,6 @@ export async function POST(request: Request) {
       continue;
     }
 
-    // Check key format
-    if (!rawKey.startsWith("sk-ant-admin")) {
-      results.push({
-        key_id: k.id,
-        key_hint: k.key_hint,
-        status: "error",
-        message: "Key is not an Admin API Key. Anthropic usage API requires a key starting with 'sk-ant-admin...'",
-      });
-      continue;
-    }
-
     // Fetch usage from Anthropic Admin API
     try {
       const url = `https://api.anthropic.com/v1/organizations/usage_report/messages?starting_at=${encodeURIComponent(startingAt)}&bucket_width=1d`;
@@ -105,9 +94,11 @@ export async function POST(request: Request) {
 
       if (!response.ok) {
         const errJson = await response.json().catch(() => ({}));
-        const errMsg =
-          errJson.error?.message ||
-          `Anthropic API returned status ${response.status} (${response.statusText})`;
+        let errMsg = errJson.error?.message;
+
+        if (response.status === 401 || response.status === 403 || !errMsg) {
+          errMsg = "This key doesn't have permission to access usage data. Make sure you're using an Admin API key, or a personal/service key that isn't scoped to a specific workspace.";
+        }
 
         results.push({
           key_id: k.id,
