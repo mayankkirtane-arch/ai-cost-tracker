@@ -86,10 +86,19 @@ export function AddKeyForm({ onClose }: { onClose: () => void }) {
             type="password"
             value={apiKey}
             onChange={(e) => setApiKey(e.target.value)}
-            placeholder="sk-..."
+            placeholder={provider === "anthropic" ? "sk-ant-admin..." : "sk-..."}
             required
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono"
           />
+          {provider === "anthropic" ? (
+            <p className="mt-1 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded p-2">
+              ℹ️ Usage tracking requires an <strong>Admin API Key</strong> (starts with <code>sk-ant-admin...</code>) created under <strong>Settings &gt; Admin Keys</strong> in the Anthropic Console.
+            </p>
+          ) : (
+            <p className="mt-1 text-xs text-blue-700 bg-blue-50 border border-blue-200 rounded p-2">
+              ℹ️ Usage tracking for {provider === "openai" ? "OpenAI" : "Groq"} is coming soon (provider does not offer standard usage API).
+            </p>
+          )}
         </div>
 
         <div>

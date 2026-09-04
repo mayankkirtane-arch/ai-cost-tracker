@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { LogoutButton } from "./logout-button";
 import { ApiKeyList } from "./api-key-list";
+import { UsageDisplay } from "./usage-display";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -20,8 +21,16 @@ export default async function DashboardPage() {
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
+  // Fetch user's usage logs
+  const { data: logs } = await supabase
+    .from("usage_logs")
+    .select("*, api_keys(provider, label, key_hint)")
+    .eq("user_id", user.id)
+    .order("fetched_at", { ascending: false })
+    .limit(50);
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 pb-16">
       {/* Top nav */}
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -38,8 +47,9 @@ export default async function DashboardPage() {
       </header>
 
       {/* Main content */}
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
         <ApiKeyList initialKeys={keys || []} />
+        <UsageDisplay initialLogs={logs || []} />
       </main>
     </div>
   );
